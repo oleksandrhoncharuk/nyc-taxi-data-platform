@@ -1,6 +1,15 @@
+# Python
 .venv/
-.env
 __pycache__/
 *.pyc
 
+# Environment
+.env
+
+# Raw data
 data/raw
+
+# dbt generated files
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/

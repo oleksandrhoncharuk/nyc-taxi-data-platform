@@ -6,3 +6,17 @@ profile: "nyc_taxi"
 
 model-paths:
   - "models"
+
+models:
+  nyc_taxi:
+    staging:
+      +schema: staging
+      +materialized: view
+
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+
+    marts:
+      +schema: analytics
+      +materialized: table

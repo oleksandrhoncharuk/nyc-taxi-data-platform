@@ -13,3 +13,6 @@ data/raw
 dbt/target/
 dbt/logs/
 dbt/dbt_packages/
+
+# airflow
+airflow/logs/

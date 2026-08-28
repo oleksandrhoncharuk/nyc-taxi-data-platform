@@ -1,5 +1,7 @@
 services:
   airflow:
+    restart: "no"
+
     build:
       context: .
       dockerfile: airflow/Dockerfile
@@ -33,6 +35,8 @@ services:
       - postgres
 
   postgres:
+    restart: "no"
+    
     image: postgres:18
 
     container_name: nyc-taxi-postgres

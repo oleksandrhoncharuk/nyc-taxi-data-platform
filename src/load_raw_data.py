@@ -4,7 +4,9 @@ import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, inspect, text
 
-TRIPS_FILE = "data/raw/yellow_tripdata_2026-01.parquet"
+DATA_MONTH = os.getenv("DATA_MONTH", "2026-01")
+
+TRIPS_FILE = f"data/raw/yellow_tripdata_{DATA_MONTH}.parquet"
 ZONES_FILE = "data/raw/taxi_zone_lookup.csv"
 
 def reload_table(dataframe, table_name, engine):
@@ -19,6 +21,31 @@ def reload_table(dataframe, table_name, engine):
             )
 
     print(f"Loading raw.{table_name}...")
+
+    dataframe.to_sql(
+        name=table_name,
+        con=engine,
+        schema="raw",
+        if_exists="append",
+        index=False,
+        chunksize=10_000,
+    )
+
+def reload_trip_month(dataframe, table_name, engine, data_month):
+    inspector = inspect(engine)
+
+    if inspector.has_table(table_name, schema="raw"):
+        print(f"Removing existing {data_month} data...")
+        with engine.begin() as connection:
+            connection.execute(
+                text(
+                    f'DELETE FROM raw."{table_name}" '
+                    f'WHERE source_month = :data_month'
+                ),
+                {"data_month": data_month},
+            )
+
+    print(f"Loading {data_month} into raw.{table_name}...")
 
     dataframe.to_sql(
         name=table_name,
@@ -68,13 +95,16 @@ def main():
     print("Reading yellow taxi trips...")
     trips = pd.read_parquet(TRIPS_FILE)
 
+    trips["source_month"] = DATA_MONTH
+
     print(f"Trips to load: {len(trips)}")
 
     print("Loading trips into PostgreSQL...")
-    reload_table(
+    reload_trip_month(
             trips,
             "yellow_taxi_trips",
-            engine
+            engine,
+            DATA_MONTH,
         )
     # trips.to_sql(
     #     name="yellow_taxi_trips",

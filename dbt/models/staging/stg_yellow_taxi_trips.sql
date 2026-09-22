@@ -18,5 +18,6 @@ SELECT
     total_amount,
     congestion_surcharge,
     "Airport_fee" AS airport_fee,
-    cbd_congestion_fee
+    cbd_congestion_fee,
+    source_month
 FROM {{ source('raw', 'yellow_taxi_trips') }}

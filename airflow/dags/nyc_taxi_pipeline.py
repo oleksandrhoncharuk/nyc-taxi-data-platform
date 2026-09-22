@@ -8,6 +8,9 @@ with DAG(
     schedule=None,
     catchup=False,
     tags=["nyc-taxi"],
+    params={
+        "data_month": "2026-01",
+    },
     default_args={
         "retries": 2,
         "retry_delay": timedelta(minutes=1),
@@ -18,12 +21,20 @@ with DAG(
         task_id="download_raw_data",
         bash_command="python src/download_raw_data.py",
         cwd="/opt/airflow/project",
+        env={
+            "DATA_MONTH": "{{ params.data_month }}",
+        },
+        append_env=True,
     )
 
     load_raw_data = BashOperator(
         task_id="load_raw_data",
         bash_command="python src/load_raw_data.py",
         cwd="/opt/airflow/project",
+        env={
+            "DATA_MONTH": "{{ params.data_month }}",
+        },
+        append_env=True,
     )
 
     dbt_build = BashOperator(
@@ -34,6 +45,10 @@ with DAG(
             "--profiles-dir dbt"
         ),
         cwd="/opt/airflow/project",
+        env={
+            "DATA_MONTH": "{{ params.data_month }}",
+        },
+        append_env=True,
     )
 
     download_raw_data >> load_raw_data >> dbt_build

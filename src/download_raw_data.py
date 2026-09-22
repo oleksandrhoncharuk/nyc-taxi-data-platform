@@ -1,11 +1,14 @@
+import os
 from pathlib import Path
 from urllib.request import urlretrieve
 
 RAW_DIR = Path("data/raw")
 
+DATA_MONTH = os.getenv("DATA_MONTH", "2026-01")
+
 TRIPS_URL = (
     "https://d37ci6vzurychx.cloudfront.net/"
-    "trip-data/yellow_tripdata_2026-01.parquet"
+    f"trip-data/yellow_tripdata_{DATA_MONTH}.parquet"
 )
 
 ZONES_URL = (
@@ -26,7 +29,7 @@ def download_file(url: str, destination: Path):
 def main():
     download_file(
         TRIPS_URL,
-        RAW_DIR / "yellow_tripdata_2026-01.parquet",
+        RAW_DIR / f"yellow_tripdata_{DATA_MONTH}.parquet",
     )
 
     download_file(

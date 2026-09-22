@@ -5,8 +5,8 @@ SELECT
         WHEN dropoff_datetime < pickup_datetime
             THEN 'dropoff_before_pickup'
 
-        WHEN pickup_datetime < TIMESTAMP '2026-01-01 00:00:00'
-          OR pickup_datetime >= TIMESTAMP '2026-02-01 00:00:00'
+        WHEN pickup_datetime < TO_DATE(source_month || '-01', 'YYYY-MM-DD')
+          OR pickup_datetime >= TO_DATE(source_month || '-01', 'YYYY-MM-DD') + INTERVAL '1 month'
             THEN 'outside_expected_month'
 
         WHEN trip_distance > 1000
@@ -19,7 +19,7 @@ FROM {{ ref('stg_yellow_taxi_trips') }}
 
 WHERE dropoff_datetime < pickup_datetime
 
-    OR pickup_datetime < TIMESTAMP '2026-01-01 00:00:00'
-    OR pickup_datetime >= TIMESTAMP '2026-02-01 00:00:00'
+    OR pickup_datetime < TO_DATE(source_month || '-01', 'YYYY-MM-DD')
+    OR pickup_datetime >= TO_DATE(source_month || '-01', 'YYYY-MM-DD') + INTERVAL '1 month'
 
     OR trip_distance > 1000

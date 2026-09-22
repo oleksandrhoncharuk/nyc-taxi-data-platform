@@ -28,11 +28,12 @@ SELECT
     total_amount,
     congestion_surcharge,
     airport_fee,
-    cbd_congestion_fee
+    cbd_congestion_fee,
+    source_month
 
 FROM {{ ref('stg_yellow_taxi_trips') }}
 
 WHERE dropoff_datetime >= pickup_datetime
-  AND pickup_datetime >= TIMESTAMP '2026-01-01 00:00:00'
-  AND pickup_datetime < TIMESTAMP '2026-02-01 00:00:00'
+  AND pickup_datetime >= TO_DATE(source_month || '-01', 'YYYY-MM-DD')
+  AND pickup_datetime < TO_DATE(source_month || '-01', 'YYYY-MM-DD') + INTERVAL '1 month'
   AND trip_distance <= 1000

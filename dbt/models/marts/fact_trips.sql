@@ -24,6 +24,7 @@ SELECT
     total_amount,
     congestion_surcharge,
     airport_fee,
-    cbd_congestion_fee
+    cbd_congestion_fee,
+    source_month
 
 FROM {{ ref('int_yellow_taxi_trips') }}

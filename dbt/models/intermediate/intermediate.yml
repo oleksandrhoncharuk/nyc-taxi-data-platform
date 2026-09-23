@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: int_yellow_taxi_trips
-    
+
     columns:
       - name: pickup_datetime
         data_tests:

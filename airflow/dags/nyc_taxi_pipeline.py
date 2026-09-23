@@ -1,15 +1,27 @@
 from datetime import timedelta
 
+import pendulum
 from airflow.providers.standard.operators.bash import BashOperator
 from airflow.sdk import DAG
 
+DATA_MONTH_TEMPLATE = (
+    "{{ params.data_month if params.data_month else data_interval_start.strftime('%Y-%m') }}"
+)
+
 with DAG(
     dag_id="nyc_taxi_pipeline",
-    schedule=None,
+    schedule="0 6 5 * *",
+    start_date=pendulum.datetime(
+        2026,
+        9,
+        23,
+        tz="UTC",
+    ),
     catchup=False,
+    max_active_runs=1,
     tags=["nyc-taxi"],
     params={
-        "data_month": "2026-01",
+        "data_month": "",
     },
     default_args={
         "retries": 2,
@@ -21,7 +33,7 @@ with DAG(
         bash_command="python src/download_raw_data.py",
         cwd="/opt/airflow/project",
         env={
-            "DATA_MONTH": "{{ params.data_month }}",
+            "DATA_MONTH": DATA_MONTH_TEMPLATE,
         },
         append_env=True,
     )
@@ -31,7 +43,7 @@ with DAG(
         bash_command="python src/load_raw_data.py",
         cwd="/opt/airflow/project",
         env={
-            "DATA_MONTH": "{{ params.data_month }}",
+            "DATA_MONTH": DATA_MONTH_TEMPLATE,
         },
         append_env=True,
     )
@@ -41,7 +53,7 @@ with DAG(
         bash_command=("dbt build --project-dir dbt --profiles-dir dbt"),
         cwd="/opt/airflow/project",
         env={
-            "DATA_MONTH": "{{ params.data_month }}",
+            "DATA_MONTH": DATA_MONTH_TEMPLATE,
         },
         append_env=True,
     )

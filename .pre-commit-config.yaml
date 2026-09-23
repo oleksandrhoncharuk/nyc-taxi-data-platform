@@ -1,0 +1,37 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-added-large-files
+
+  - repo: local
+    hooks:
+    - id: ruff-check
+      name: Ruff Lint
+      entry: ruff check .
+      language: system
+      pass_filenames: false
+      stages: [pre-commit]
+
+    - id: ruff-format
+      name: Ruff format check
+      entry: ruff format --check .
+      language: system
+      pass_filenames: false
+      stages: [pre-commit]
+
+    - id: commit-message
+      name: Validate commit message
+      entry: cz check --commit-msg-file
+      language: system
+      stages: [commit-msg]
+
+    - id: pre-push-checks
+      name: Pre-push quality checks
+      entry: bash -c 'ruff check . && ruff format --check . && pytest -q && cz check --rev-range origin/main..HEAD'
+      language: system
+      pass_filenames: false
+      stages: [pre-push]

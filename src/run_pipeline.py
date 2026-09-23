@@ -1,6 +1,7 @@
 from download_raw_data import main as download_raw_data
 from load_raw_data import main as load_raw_data
 
+
 def main():
     print("=== STEP 1: DOWNLOAD RAW DATA ===")
     download_raw_data()

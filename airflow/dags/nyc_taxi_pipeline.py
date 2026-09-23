@@ -1,7 +1,7 @@
-from airflow.sdk import DAG
 from datetime import timedelta
-from airflow.providers.standard.operators.bash import BashOperator
 
+from airflow.providers.standard.operators.bash import BashOperator
+from airflow.sdk import DAG
 
 with DAG(
     dag_id="nyc_taxi_pipeline",
@@ -16,7 +16,6 @@ with DAG(
         "retry_delay": timedelta(minutes=1),
     },
 ) as dag:
-
     download_raw_data = BashOperator(
         task_id="download_raw_data",
         bash_command="python src/download_raw_data.py",
@@ -39,11 +38,7 @@ with DAG(
 
     dbt_build = BashOperator(
         task_id="dbt_build",
-        bash_command=(
-            "dbt build "
-            "--project-dir dbt "
-            "--profiles-dir dbt"
-        ),
+        bash_command=("dbt build --project-dir dbt --profiles-dir dbt"),
         cwd="/opt/airflow/project",
         env={
             "DATA_MONTH": "{{ params.data_month }}",

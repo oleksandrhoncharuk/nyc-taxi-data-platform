@@ -9,6 +9,7 @@ DATA_MONTH = os.getenv("DATA_MONTH", "2026-01")
 TRIPS_FILE = f"data/raw/yellow_tripdata_{DATA_MONTH}.parquet"
 ZONES_FILE = "data/raw/taxi_zone_lookup.csv"
 
+
 def reload_table(dataframe, table_name, engine):
     inspector = inspect(engine)
 
@@ -16,9 +17,7 @@ def reload_table(dataframe, table_name, engine):
         print(f"Clearing raw.{table_name}...")
 
         with engine.begin() as connection:
-            connection.execute(
-                text(f'TRUNCATE TABLE raw."{table_name}"')
-            )
+            connection.execute(text(f'TRUNCATE TABLE raw."{table_name}"'))
 
     print(f"Loading raw.{table_name}...")
 
@@ -31,6 +30,7 @@ def reload_table(dataframe, table_name, engine):
         chunksize=10_000,
     )
 
+
 def reload_trip_month(dataframe, table_name, engine, data_month):
     inspector = inspect(engine)
 
@@ -38,10 +38,7 @@ def reload_trip_month(dataframe, table_name, engine, data_month):
         print(f"Removing existing {data_month} data...")
         with engine.begin() as connection:
             connection.execute(
-                text(
-                    f'DELETE FROM raw."{table_name}" '
-                    f'WHERE source_month = :data_month'
-                ),
+                text(f'DELETE FROM raw."{table_name}" WHERE source_month = :data_month'),
                 {"data_month": data_month},
             )
 
@@ -56,6 +53,7 @@ def reload_trip_month(dataframe, table_name, engine, data_month):
         chunksize=10_000,
     )
 
+
 def main():
     load_dotenv()
 
@@ -65,25 +63,15 @@ def main():
     user = os.getenv("POSTGRES_USER")
     password = os.getenv("POSTGRES_PASSWORD")
 
-    database_url = (
-        f"postgresql+psycopg://"
-        f"{user}:{password}@{host}:{port}/{database}"
-    )
+    database_url = f"postgresql+psycopg://{user}:{password}@{host}:{port}/{database}"
 
     engine = create_engine(database_url)
 
     print("Reading taxi zones...")
-    zones = pd.read_csv(
-        ZONES_FILE,
-        keep_default_na=False
-    )
+    zones = pd.read_csv(ZONES_FILE, keep_default_na=False)
 
     print("Loading taxi zones into PostgreSQL...")
-    reload_table(
-        zones,
-        "taxi_zones",
-        engine
-    )
+    reload_table(zones, "taxi_zones", engine)
     # zones.to_sql(
     #     name="taxi_zones",
     #     con=engine,
@@ -101,11 +89,11 @@ def main():
 
     print("Loading trips into PostgreSQL...")
     reload_trip_month(
-            trips,
-            "yellow_taxi_trips",
-            engine,
-            DATA_MONTH,
-        )
+        trips,
+        "yellow_taxi_trips",
+        engine,
+        DATA_MONTH,
+    )
     # trips.to_sql(
     #     name="yellow_taxi_trips",
     #     con=engine,
@@ -116,6 +104,7 @@ def main():
     # )
 
     print("Loading completed.")
+
 
 if __name__ == "__main__":
     main()

@@ -11,7 +11,7 @@ models:
       - name: zone
         data_tests:
           - not_null
-  
+
   - name: fact_trips
     columns:
       - name: pickup_datetime

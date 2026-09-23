@@ -1,7 +1,7 @@
-SELECT 
+SELECT
     *,
 
-    CASE 
+    CASE
         WHEN dropoff_datetime < pickup_datetime
             THEN 'dropoff_before_pickup'
 

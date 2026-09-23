@@ -6,6 +6,13 @@ __pycache__/
 # Environment
 .env
 
+# Tests / lint
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
 # Raw data
 data/raw
 
